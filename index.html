@@ -4,554 +4,686 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cash Kapta</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F8F8F6;color:#1a1a1a;min-height:100vh}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F7F7F5;color:#1a1a1a}
 .wrap{max-width:960px;margin:0 auto;padding:2rem 1.5rem}
+
+/* topbar */
 .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:8px}
-.logo{display:flex;align-items:center;gap:8px}
-.logo-mark{width:28px;height:28px;background:#0F6E56;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600}
-.logo-name{font-size:16px;font-weight:600;color:#1a1a1a}
+.logo{display:flex;align-items:center;gap:9px}
+.logo-mark{width:30px;height:30px;background:#0F6E56;border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700}
+.logo-name{font-size:17px;font-weight:700;color:#1a1a1a}
 .logo-name span{color:#1D9E75}
-.pill{display:flex;align-items:center;gap:5px;font-size:11px;color:#666;background:#fff;border:1px solid #E0E0DA;border-radius:20px;padding:4px 11px}
-.upload-box{border:2px dashed #ccc;border-radius:12px;padding:2.5rem 1.5rem;text-align:center;cursor:pointer;background:#fff;transition:border-color .15s}
-.upload-box:hover{border-color:#1D9E75;background:#f0fdf8}
-.u-icon{font-size:40px;margin-bottom:10px}
-.u-title{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:5px}
-.u-sub{font-size:13px;color:#666;margin-bottom:14px}
-.bank-grid{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
-.bchip{font-size:11px;padding:4px 10px;border-radius:20px;background:#F1EFE8;border:1px solid #E0E0DA;color:#555;display:flex;align-items:center;gap:5px}
-.dot{width:7px;height:7px;border-radius:50%;display:inline-block}
-.btn-g{font-size:13px;font-weight:600;padding:9px 20px;border-radius:8px;border:none;background:#0F6E56;color:#fff;cursor:pointer}
-.btn-g:hover{background:#085041}
-.btn-o{font-size:12px;padding:7px 16px;border-radius:8px;border:1px solid #ddd;background:#fff;color:#555;cursor:pointer;margin-top:10px}
-.btn-o:hover{background:#f5f5f0}
-.btn-sm{font-size:11px;padding:5px 12px;border-radius:8px;border:1px solid #ddd;background:#fff;color:#555;cursor:pointer}
+.pill{font-size:12px;color:#666;background:#fff;border:1px solid #E0E0DA;border-radius:20px;padding:5px 12px}
 
-.staged{display:none;background:#fff;border:1px solid #E0E0DA;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
-.staged-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.staged-title{font-size:13px;font-weight:600;color:#555}
-.file-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
-.file-row{display:flex;align-items:center;gap:10px;background:#F8F8F6;border-radius:8px;padding:9px 12px}
-.file-ico{font-size:20px}
+/* upload */
+.upload-zone{background:#fff;border:2px dashed #C8C8C0;border-radius:14px;padding:3rem 2rem;text-align:center;cursor:pointer;transition:all .2s}
+.upload-zone:hover{border-color:#1D9E75;background:#f0fdf8}
+.upload-zone h2{font-size:16px;font-weight:600;margin:12px 0 6px}
+.upload-zone p{font-size:13px;color:#777;margin-bottom:16px}
+.bank-chips{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+.chip{font-size:11px;padding:4px 11px;border-radius:20px;background:#F1EFE8;border:1px solid #E0E0DA;color:#555;display:flex;align-items:center;gap:5px}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
+.btn-primary{background:#0F6E56;color:#fff;border:none;padding:11px 24px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer}
+.btn-primary:hover{background:#085041}
+.btn-secondary{background:#fff;color:#555;border:1px solid #ddd;padding:9px 18px;border-radius:9px;font-size:13px;cursor:pointer;margin-top:12px}
+.btn-secondary:hover{background:#F1EFE8}
+.btn-small{background:#fff;color:#555;border:1px solid #ddd;padding:6px 13px;border-radius:8px;font-size:12px;cursor:pointer}
+.btn-small:hover{background:#F1EFE8}
+
+/* staged */
+.staged{display:none;background:#fff;border:1px solid #E0E0DA;border-radius:14px;padding:1.25rem;margin-bottom:1rem}
+.staged-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.staged-hd h3{font-size:13px;font-weight:600;color:#555}
+.file-list{display:flex;flex-direction:column;gap:7px;margin-bottom:10px}
+.file-row{display:flex;align-items:center;gap:10px;background:#F7F7F5;border-radius:9px;padding:9px 13px}
+.file-icon{font-size:20px;flex-shrink:0}
 .file-info{flex:1;min-width:0}
-.file-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.file-meta{font-size:10px;color:#999}
-.bank-badge{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:600}
-.rm{font-size:16px;cursor:pointer;border:none;background:none;color:#bbb;padding:0 4px}
-.rm:hover{color:#E24B4A}
-.add-more{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px;border:1px dashed #ddd;border-radius:8px;cursor:pointer;font-size:12px;color:#aaa;margin-bottom:12px}
-.add-more:hover{border-color:#1D9E75;color:#1D9E75}
-.btn-row{display:flex;gap:8px;justify-content:center}
+.file-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file-size{font-size:10px;color:#999;margin-top:1px}
+.bank-tag{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;flex-shrink:0}
+.rm-btn{background:none;border:none;cursor:pointer;color:#bbb;font-size:18px;padding:0 4px;line-height:1}
+.rm-btn:hover{color:#E24B4A}
+.add-more-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:9px;border:1px dashed #ccc;border-radius:9px;cursor:pointer;font-size:12px;color:#aaa;background:none;margin-bottom:12px}
+.add-more-btn:hover{border-color:#1D9E75;color:#1D9E75}
+.staged-actions{display:flex;gap:8px;justify-content:center}
 
-.prog-wrap{display:none;background:#fff;border:1px solid #E0E0DA;border-radius:12px;padding:2.5rem;text-align:center}
-.prog-bar{height:4px;background:#E1F5EE;border-radius:4px;overflow:hidden;margin:12px 0}
-.prog-fill{height:100%;background:#1D9E75;border-radius:4px;transition:width .4s}
+/* progress */
+.progress-wrap{display:none;background:#fff;border:1px solid #E0E0DA;border-radius:14px;padding:3rem 2rem;text-align:center}
+.progress-wrap h3{font-size:15px;font-weight:600;margin-bottom:5px}
+.progress-wrap p{font-size:13px;color:#777;margin-bottom:14px}
+.prog-track{height:5px;background:#E1F5EE;border-radius:5px;overflow:hidden;max-width:320px;margin:0 auto 8px}
+.prog-bar{height:100%;background:#1D9E75;border-radius:5px;width:0%;transition:width .4s ease}
+.prog-pct{font-size:12px;color:#999}
 
-.dash{display:none}
-.dash-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;background:#fff;border:1px solid #E0E0DA;border-radius:12px;padding:12px 16px;flex-wrap:wrap;gap:8px}
-.accs{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
-.acc-pill{display:flex;align-items:center;gap:5px;font-size:11px;padding:3px 10px;border-radius:20px;border:1px solid #E0E0DA;background:#F8F8F6;color:#555}
+/* dashboard */
+.dashboard{display:none}
+.dash-header{background:#fff;border:1px solid #E0E0DA;border-radius:12px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.dash-title{font-size:14px;font-weight:600}
+.dash-accounts{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.acc-badge{font-size:11px;padding:3px 10px;border-radius:20px;border:1px solid #E0E0DA;background:#F7F7F5;color:#555;display:flex;align-items:center;gap:5px}
+.dash-actions{display:flex;gap:7px}
 
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:1rem}
-.kpi{background:#fff;border:1px solid #E0E0DA;border-radius:8px;padding:12px 14px}
-.kpi-l{font-size:11px;color:#999;margin-bottom:4px}
-.kpi-v{font-size:20px;font-weight:600;letter-spacing:-0.5px}
-.pos{color:#1D9E75}.neg{color:#E24B4A}
+/* kpis */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px;margin-bottom:12px}
+.kpi{background:#fff;border:1px solid #E0E0DA;border-radius:10px;padding:13px 15px}
+.kpi-label{font-size:11px;color:#999;margin-bottom:5px}
+.kpi-value{font-size:22px;font-weight:700;letter-spacing:-0.5px}
+.kpi-sub{font-size:10px;color:#999;margin-top:3px}
+.green{color:#1D9E75}.red{color:#E24B4A}
 
-.nudge{background:#fff;border:1.5px solid #5DCAA5;border-radius:12px;padding:14px 16px;margin-bottom:1rem;display:flex;align-items:flex-start;gap:14px}
-.nudge-lbl{font-size:10px;font-weight:700;color:#0F6E56;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px}
-.nudge-txt{font-size:13px;line-height:1.5;margin-bottom:10px}
-.nudge-acts{display:flex;gap:8px}
-.btn-fin{font-size:12px;font-weight:600;padding:7px 14px;border-radius:8px;border:none;background:#0F6E56;color:#fff;cursor:pointer}
-.btn-fin:hover{background:#085041}
-.btn-no{font-size:12px;padding:7px 12px;border-radius:8px;border:1px solid #ddd;background:#fff;color:#888;cursor:pointer}
-.score-box{text-align:center;min-width:58px}
-.score-lbl{font-size:10px;color:#888;margin-top:3px}
+/* nudge */
+.nudge{background:#fff;border:1.5px solid #5DCAA5;border-radius:12px;padding:14px 16px;margin-bottom:12px;display:flex;align-items:flex-start;gap:14px}
+.nudge-content{flex:1}
+.nudge-eyebrow{font-size:10px;font-weight:700;color:#0F6E56;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px}
+.nudge-text{font-size:13px;line-height:1.5;color:#1a1a1a;margin-bottom:10px}
+.nudge-btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn-cta{background:#0F6E56;color:#fff;border:none;padding:7px 15px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer}
+.btn-cta:hover{background:#085041}
+.btn-ghost{background:#fff;color:#888;border:1px solid #ddd;padding:7px 12px;border-radius:8px;font-size:12px;cursor:pointer}
+.score-widget{text-align:center;min-width:60px}
+.score-label{font-size:10px;color:#888;margin-top:3px}
 
-.alert{background:#FAEEDA;border:1px solid #EF9F27;border-radius:8px;padding:10px 14px;font-size:12px;color:#633806;display:flex;align-items:center;gap:8px;margin-bottom:1rem}
+/* alert */
+.alert-bar{background:#FAEEDA;border:1px solid #EF9F27;border-radius:9px;padding:10px 14px;font-size:12px;color:#633806;display:flex;align-items:center;gap:8px;margin-bottom:12px}
 
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
-@media(max-width:600px){.grid2{grid-template-columns:1fr}}
+/* charts */
+.charts-row{display:grid;grid-template-columns:3fr 2fr;gap:10px;margin-bottom:12px}
+@media(max-width:600px){.charts-row{grid-template-columns:1fr}}
 .card{background:#fff;border:1px solid #E0E0DA;border-radius:12px;padding:1rem 1.25rem}
-.card-h{font-size:12px;font-weight:600;color:#999;margin-bottom:10px}
-.leg-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
-.leg{display:flex;align-items:center;gap:4px;font-size:11px;color:#888}
-.leg-sq{width:8px;height:8px;border-radius:2px}
+.card-title{font-size:12px;font-weight:600;color:#999;margin-bottom:10px}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.leg-item{display:flex;align-items:center;gap:4px;font-size:11px;color:#888}
+.leg-swatch{width:8px;height:8px;border-radius:2px}
+.donut-leg{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px}
 
-.cat-tabs{display:flex;gap:3px;background:#F1EFE8;border-radius:8px;padding:3px;width:fit-content;margin-bottom:10px}
-.ct{font-size:12px;padding:5px 14px;border-radius:6px;cursor:pointer;color:#888;border:none;background:none;font-family:inherit;font-weight:500}
-.ct.on{background:#fff;color:#1a1a1a;font-weight:600;border:1px solid #E0E0DA}
+/* cat tabs */
+.cat-tabs{display:flex;gap:3px;background:#EEECE6;border-radius:8px;padding:3px;width:fit-content;margin-bottom:10px}
+.cat-tab{font-size:12px;padding:5px 16px;border-radius:6px;border:none;background:transparent;color:#888;cursor:pointer;font-weight:500;font-family:inherit}
+.cat-tab.active{background:#fff;color:#1a1a1a;font-weight:600;border:1px solid #E0E0DA}
 
-.txn-wrap{background:#fff;border:1px solid #E0E0DA;border-radius:12px;overflow:hidden}
-.txn-top{display:flex;align-items:center;justify-content:space-between;padding:12px 1.25rem 8px;flex-wrap:wrap;gap:8px}
-.txn-title{font-size:12px;font-weight:600;color:#888}
-.filters{display:flex;gap:5px;padding:0 1.25rem 10px;flex-wrap:wrap}
-.fb{font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid #E0E0DA;background:#fff;color:#888;cursor:pointer}
-.fb.on{background:#E1F5EE;border-color:#5DCAA5;color:#0F6E56;font-weight:600}
-table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
-th{font-size:11px;font-weight:600;color:#999;text-align:left;padding:8px 1.25rem;border-bottom:1px solid #E0E0DA;background:#F8F8F6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-th.r,td.r{text-align:right}
-td{padding:9px 1.25rem;border-bottom:1px solid #F0F0EC;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:#F8F8F6}
-.cat-tag{font-size:10px;padding:2px 7px;border-radius:20px;background:#F1EFE8;color:#666;border:1px solid #E0E0DA}
+/* transactions */
+.txn-card{background:#fff;border:1px solid #E0E0DA;border-radius:12px;overflow:hidden}
+.txn-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px;flex-wrap:wrap;gap:6px}
+.txn-title{font-size:12px;font-weight:600;color:#999}
+.txn-count{font-size:10px;background:#F1EFE8;padding:2px 8px;border-radius:20px;margin-left:5px}
+.txn-range{font-size:11px;color:#aaa}
+.filter-bar{display:flex;gap:5px;padding:0 16px 10px;flex-wrap:wrap}
+.filter-btn{font-size:11px;padding:4px 11px;border-radius:20px;border:1px solid #E0E0DA;background:#fff;color:#888;cursor:pointer}
+.filter-btn.active{background:#E1F5EE;border-color:#5DCAA5;color:#0F6E56;font-weight:600}
+.txn-table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+.txn-table th{font-size:11px;font-weight:600;color:#999;text-align:left;padding:8px 16px;border-bottom:1px solid #E0E0DA;background:#F7F7F5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.txn-table td{padding:9px 16px;border-bottom:1px solid #F0F0EB;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.txn-table tr:last-child td{border-bottom:none}
+.txn-table tr:hover td{background:#F7F7F5}
+.txn-table .r{text-align:right}
+.cat-pill{font-size:10px;padding:2px 8px;border-radius:20px;background:#F1EFE8;color:#666;border:1px solid #E0E0DA}
 </style>
 </head>
 <body>
 <div class="wrap">
+
   <div class="topbar">
     <div class="logo">
       <div class="logo-mark">CK</div>
       <div class="logo-name">Cash <span>Kapta</span></div>
     </div>
     <div style="display:flex;gap:6px">
-      <div class="pill">🏢 Mi empresa</div>
-      <div class="pill">👤 Mi cuenta</div>
+      <span class="pill">🏢 Mi empresa</span>
+      <span class="pill">👤 Mi cuenta</span>
     </div>
   </div>
 
-  <!-- UPLOAD -->
-  <div id="upload-section">
-    <div class="upload-box" id="drop-zone"
-      onclick="document.getElementById('fi').click()"
-      ondragover="event.preventDefault();this.style.borderColor='#1D9E75'"
-      ondragleave="this.style.borderColor='#ccc'"
-      ondrop="onDrop(event)">
-      <input type="file" id="fi" accept=".xlsx,.xls,.csv" multiple onchange="onFiles(this.files)" style="display:none">
-      <div class="u-icon">📂</div>
-      <div class="u-title">Arrastra uno o varios estados de cuenta</div>
-      <div class="u-sub">Puedes subir múltiples archivos — cada banco se detecta automáticamente</div>
-      <div class="bank-grid">
-        <span class="bchip"><span class="dot" style="background:#0066CC"></span>BBVA</span>
-        <span class="bchip"><span class="dot" style="background:#CC0000"></span>Banamex</span>
-        <span class="bchip"><span class="dot" style="background:#E30613"></span>Banorte</span>
-        <span class="bchip"><span class="dot" style="background:#EC0000"></span>Santander</span>
-        <span class="bchip"><span class="dot" style="background:#DB0011"></span>HSBC</span>
+  <!-- STEP 1: UPLOAD -->
+  <div id="step-upload">
+    <div class="upload-zone" id="drop-zone"
+      onclick="document.getElementById('file-input').click()"
+      ondragover="event.preventDefault();this.style.borderColor='#1D9E75';this.style.background='#f0fdf8'"
+      ondragleave="this.style.borderColor='#C8C8C0';this.style.background='#fff'"
+      ondrop="handleDrop(event)">
+      <input type="file" id="file-input" accept=".xlsx,.xls,.csv" multiple style="display:none" onchange="handleFiles(this.files)">
+      <div style="font-size:44px;margin-bottom:8px">📂</div>
+      <h2>Arrastra uno o varios estados de cuenta</h2>
+      <p>Puedes subir múltiples archivos — cada banco se detecta automáticamente por el nombre</p>
+      <div class="bank-chips">
+        <span class="chip"><span class="dot" style="background:#0066CC"></span>BBVA .xlsx</span>
+        <span class="chip"><span class="dot" style="background:#CC0000"></span>Banamex .xls</span>
+        <span class="chip"><span class="dot" style="background:#E30613"></span>Banorte .xlsx</span>
+        <span class="chip"><span class="dot" style="background:#EC0000"></span>Santander .xlsx</span>
+        <span class="chip"><span class="dot" style="background:#DB0011"></span>HSBC .csv</span>
       </div>
-      <button class="btn-g" onclick="event.stopPropagation();document.getElementById('fi').click()">📤 Seleccionar archivos</button>
+      <button class="btn-primary" onclick="event.stopPropagation();document.getElementById('file-input').click()">
+        📤 Seleccionar archivos
+      </button>
     </div>
-    <div style="text-align:center">
-      <button class="btn-o" onclick="loadDemo()">✨ Ver demo — 3 bancos de ejemplo</button>
+    <div style="text-align:center;margin-top:12px">
+      <button class="btn-secondary" onclick="runDemo()">✨ Ver demo con 3 bancos de ejemplo</button>
     </div>
   </div>
 
-  <!-- STAGED -->
-  <div class="staged" id="staged">
+  <!-- STEP 2: STAGED FILES -->
+  <div class="staged" id="step-staged">
     <div class="staged-hd">
-      <div class="staged-title">📋 Archivos listos para procesar</div>
-      <button class="btn-sm" onclick="document.getElementById('fi2').click()">+ Agregar más</button>
-      <input type="file" id="fi2" accept=".xlsx,.xls,.csv" multiple onchange="addFiles(this.files)" style="display:none">
+      <h3>📋 Archivos listos para procesar</h3>
+      <button class="btn-small" onclick="document.getElementById('add-more-input').click()">+ Agregar más</button>
+      <input type="file" id="add-more-input" accept=".xlsx,.xls,.csv" multiple style="display:none" onchange="handleFiles(this.files)">
     </div>
     <div class="file-list" id="file-list"></div>
-    <div class="add-more" onclick="document.getElementById('fi2').click()">+ Agregar otro banco</div>
-    <div class="btn-row">
-      <button class="btn-o" onclick="cancelStaged()">Cancelar</button>
-      <button class="btn-g" id="process-btn" onclick="processAll()">📊 Generar dashboard consolidado</button>
+    <button class="add-more-btn" onclick="document.getElementById('add-more-input').click()">
+      ➕ Agregar otro banco
+    </button>
+    <div class="staged-actions">
+      <button class="btn-secondary" onclick="cancelStaged()" style="margin-top:0">Cancelar</button>
+      <button class="btn-primary" id="process-btn" onclick="processFiles()">📊 Generar dashboard</button>
     </div>
   </div>
 
-  <!-- PROGRESS -->
-  <div class="prog-wrap" id="prog">
-    <div style="font-size:32px;margin-bottom:10px">🔍</div>
-    <div style="font-size:14px;font-weight:600;margin-bottom:4px" id="prog-title">Procesando...</div>
-    <div style="font-size:12px;color:#888" id="prog-sub">Detectando formato bancario</div>
-    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
-    <div style="font-size:11px;color:#888" id="prog-pct">0%</div>
+  <!-- STEP 3: PROGRESS -->
+  <div class="progress-wrap" id="step-progress">
+    <div style="font-size:40px;margin-bottom:14px">🔍</div>
+    <h3 id="prog-title">Analizando archivos...</h3>
+    <p id="prog-sub">Detectando formato bancario</p>
+    <div class="prog-track"><div class="prog-bar" id="prog-bar"></div></div>
+    <div class="prog-pct" id="prog-pct">0%</div>
   </div>
 
-  <!-- DASHBOARD -->
-  <div class="dash" id="dash">
-    <div class="dash-hd">
+  <!-- STEP 4: DASHBOARD -->
+  <div class="dashboard" id="step-dashboard">
+    <div class="dash-header">
       <div>
-        <div style="font-size:14px;font-weight:600">Dashboard consolidado</div>
-        <div class="accs" id="accs"></div>
+        <div class="dash-title">Dashboard consolidado</div>
+        <div class="dash-accounts" id="dash-accounts"></div>
       </div>
-      <div style="display:flex;gap:6px">
-        <button class="btn-o" onclick="resetApp()">↺ Nuevo análisis</button>
-        <button class="btn-g" style="font-size:12px;padding:7px 14px">⬇ Exportar</button>
+      <div class="dash-actions">
+        <button class="btn-small" onclick="resetAll()">↺ Nuevo análisis</button>
+        <button class="btn-primary" style="font-size:12px;padding:7px 15px">⬇ Exportar</button>
       </div>
     </div>
 
-    <div class="kpis" id="kpis"></div>
-    <div class="nudge" id="nudge" style="display:none">
-      <div style="flex:1">
-        <div class="nudge-lbl">✦ Kapta detectó una oportunidad</div>
-        <div class="nudge-txt" id="nudge-txt">Tu flujo muestra meses positivos consecutivos.</div>
-        <div class="nudge-acts">
-          <button class="btn-fin">💰 Ver opciones de financiamiento</button>
-          <button class="btn-no">Ahora no</button>
+    <div class="kpis" id="kpis-row"></div>
+
+    <div class="nudge" id="nudge-card" style="display:none">
+      <div class="nudge-content">
+        <div class="nudge-eyebrow">✦ Kapta detectó una oportunidad</div>
+        <div class="nudge-text" id="nudge-text">Tu flujo muestra meses positivos consecutivos.</div>
+        <div class="nudge-btns">
+          <button class="btn-cta">💰 Ver opciones de financiamiento</button>
+          <button class="btn-ghost">Ahora no</button>
         </div>
       </div>
-      <div class="score-box">
-        <svg viewBox="0 0 52 52" width="56" height="56">
-          <circle cx="26" cy="26" r="22" fill="none" stroke="#E1F5EE" stroke-width="4"/>
-          <circle cx="26" cy="26" r="22" fill="none" stroke="#1D9E75" stroke-width="4" stroke-dasharray="138" id="sarc" stroke-dashoffset="50" stroke-linecap="round" transform="rotate(-90 26 26)"/>
-          <text x="26" y="30" text-anchor="middle" font-size="13" font-weight="700" fill="#0F6E56" id="stxt">72</text>
+      <div class="score-widget">
+        <svg viewBox="0 0 56 56" width="58" height="58">
+          <circle cx="28" cy="28" r="23" fill="none" stroke="#E1F5EE" stroke-width="5"/>
+          <circle cx="28" cy="28" r="23" fill="none" stroke="#1D9E75" stroke-width="5"
+            stroke-dasharray="144.5" id="score-ring" stroke-dashoffset="50"
+            stroke-linecap="round" transform="rotate(-90 28 28)"/>
+          <text x="28" y="33" text-anchor="middle" font-size="14" font-weight="700" fill="#0F6E56" id="score-number">72</text>
         </svg>
-        <div class="score-lbl">score kapta</div>
+        <div class="score-label">score kapta</div>
       </div>
     </div>
 
-    <div id="alert-wrap"></div>
+    <div id="alert-container"></div>
 
     <div class="cat-tabs">
-      <button class="ct on" onclick="switchCat('gastos',this)">Gastos</button>
-      <button class="ct" onclick="switchCat('ingresos',this)">Ingresos</button>
+      <button class="cat-tab active" onclick="switchMode('out',this)">Gastos</button>
+      <button class="cat-tab" onclick="switchMode('in',this)">Ingresos</button>
     </div>
 
-    <div class="grid2">
+    <div class="charts-row">
       <div class="card">
-        <div class="card-h">📊 Flujo mensual consolidado</div>
-        <div class="leg-row">
-          <div class="leg"><div class="leg-sq" style="background:#5DCAA5"></div>Ingresos</div>
-          <div class="leg"><div class="leg-sq" style="background:#F09595"></div>Egresos</div>
+        <div class="card-title">📊 Flujo mensual consolidado</div>
+        <div class="legend">
+          <div class="leg-item"><div class="leg-swatch" style="background:#5DCAA5"></div>Ingresos</div>
+          <div class="leg-item"><div class="leg-swatch" style="background:#F09595"></div>Egresos</div>
+          <div class="leg-item"><div class="leg-swatch" style="background:#378ADD;height:3px;border-radius:0"></div>Saldo acum.</div>
         </div>
-        <canvas id="c-flow" height="180"></canvas>
+        <div style="position:relative;height:190px">
+          <canvas id="chart-flow" aria-label="Flujo mensual">Flujo mensual de caja.</canvas>
+        </div>
       </div>
       <div class="card">
-        <div class="card-h" id="cat-title">🍩 Categorías de egreso</div>
-        <canvas id="c-cat" height="140"></canvas>
-        <div class="leg-row" id="cat-leg" style="justify-content:center;margin-top:8px"></div>
+        <div class="card-title" id="donut-title">🍩 Categorías de egreso</div>
+        <div style="position:relative;height:150px">
+          <canvas id="chart-donut" aria-label="Categorías">Categorías de movimientos.</canvas>
+        </div>
+        <div class="donut-leg" id="donut-legend"></div>
       </div>
     </div>
 
-    <div class="txn-wrap">
-      <div class="txn-top">
-        <div class="txn-title">📋 Movimientos <span id="txn-cnt" style="font-size:10px;background:#F1EFE8;padding:1px 8px;border-radius:20px;margin-left:4px"></span></div>
-        <div style="font-size:11px;color:#999" id="txn-range"></div>
+    <div class="txn-card">
+      <div class="txn-header">
+        <div>
+          <span class="txn-title">📋 Movimientos</span>
+          <span class="txn-count" id="txn-count"></span>
+        </div>
+        <span class="txn-range" id="txn-range"></span>
       </div>
-      <div class="filters" id="filter-row"></div>
-      <table>
-        <thead><tr>
-          <th style="width:82px">Fecha</th>
-          <th style="width:13%">Banco</th>
-          <th style="width:35%">Descripción</th>
-          <th style="width:80px">Categoría</th>
-          <th class="r" style="width:110px">Monto</th>
-          <th class="r" style="width:110px">Saldo</th>
-        </tr></thead>
+      <div class="filter-bar" id="filter-bar"></div>
+      <table class="txn-table">
+        <thead>
+          <tr>
+            <th style="width:85px">Fecha</th>
+            <th style="width:14%">Banco</th>
+            <th style="width:34%">Descripción</th>
+            <th style="width:82px">Categoría</th>
+            <th class="r" style="width:108px">Monto</th>
+            <th class="r" style="width:108px">Saldo</th>
+          </tr>
+        </thead>
         <tbody id="txn-body"></tbody>
       </table>
     </div>
   </div>
+
 </div>
-
 <script>
-// ── Inline Chart.js (minimal, no CDN needed) ──────────────────────────────
-// We'll draw charts manually on canvas since CDN is blocked from file://
-const MXN = v => (v<0?'-$':'$')+Math.abs(v).toLocaleString('es-MX',{minimumFractionDigits:0,maximumFractionDigits:0});
-
-const BANK_COLORS = {
-  'BBVA':      {color:'#0066CC',bg:'#E6F0FA'},
-  'Banamex':   {color:'#CC0000',bg:'#FAE6E6'},
-  'Banorte':   {color:'#E30613',bg:'#FAE6E7'},
-  'Santander': {color:'#EC0000',bg:'#FAE8E8'},
-  'HSBC':      {color:'#DB0011',bg:'#FAE6E7'},
-  'Desconocido':{color:'#888',bg:'#F1EFE8'}
+// ── Data ─────────────────────────────────────────────────────────────────
+const BANKS = {
+  BBVA:      {color:'#0066CC', bg:'#E6F0FA'},
+  Banamex:   {color:'#CC0000', bg:'#FAE6E6'},
+  Banorte:   {color:'#E30613', bg:'#FAE6E7'},
+  Santander: {color:'#EC0000', bg:'#FAE8E8'},
+  HSBC:      {color:'#DB0011', bg:'#FAE6E7'},
+  Otro:      {color:'#888',    bg:'#F1EFE8'},
 };
-const CATS_OUT = {'Nómina':'#1D9E75','Impuestos':'#E24B4A','Proveedores':'#378ADD','Renta':'#BA7517','Servicios':'#888780','Comisiones':'#D4537E','Otros':'#B4B2A9'};
-const CATS_IN  = {'Clientes':'#1D9E75','Devoluciones':'#378ADD','Otros ingresos':'#888780'};
-
-const DEMOS = [
-  {bank:'BBVA',txns:[
-    {date:'2025-05-02',desc:'SPEI RECIBIDO GRUPO NORTE SA',type:'in',cat:'Clientes',amount:320000,balance:1560000},
-    {date:'2025-05-05',desc:'PAGO ISR MENSUAL SAT',type:'out',cat:'Impuestos',amount:-98000,balance:1462000},
-    {date:'2025-05-10',desc:'NOMINA QUINCENAL',type:'out',cat:'Nómina',amount:-185000,balance:1277000},
-    {date:'2025-05-20',desc:'SPEI RECIBIDO EXPORTADORA GDL',type:'in',cat:'Clientes',amount:560000,balance:1837000},
-    {date:'2025-05-24',desc:'NOMINA QUINCENAL',type:'out',cat:'Nómina',amount:-185000,balance:1652000},
-    {date:'2025-04-03',desc:'SPEI RECIBIDO CLIENTE MAYOREO',type:'in',cat:'Clientes',amount:410000,balance:1240000},
-    {date:'2025-04-12',desc:'NOMINA QUINCENAL',type:'out',cat:'Nómina',amount:-185000,balance:1055000},
-    {date:'2025-04-25',desc:'NOMINA QUINCENAL',type:'out',cat:'Nómina',amount:-185000,balance:870000},
-    {date:'2025-04-28',desc:'SPEI RECIBIDO DISTRIBUIDOR MTY',type:'in',cat:'Clientes',amount:450000,balance:1320000},
-    {date:'2025-03-10',desc:'SPEI RECIBIDO CLIENTE RECURRENTE',type:'in',cat:'Clientes',amount:520000,balance:1340000},
-    {date:'2025-03-14',desc:'NOMINA QUINCENAL',type:'out',cat:'Nómina',amount:-185000,balance:1155000},
-    {date:'2025-03-28',desc:'SPEI RECIBIDO EXPORTADORA GDL',type:'in',cat:'Clientes',amount:380000,balance:1535000},
+const CAT_COLORS = {
+  Nómina:'#1D9E75', Impuestos:'#E24B4A', Proveedores:'#378ADD',
+  Renta:'#BA7517', Servicios:'#888780', Comisiones:'#D4537E',
+  Clientes:'#1D9E75', Devoluciones:'#378ADD', Otros:'#B4B2A9',
+};
+const DEMO_DATA = [
+  {bank:'BBVA', txns:[
+    {date:'2025-05-02',desc:'SPEI RECIBIDO GRUPO NORTE SA',    type:'in', cat:'Clientes',    amount:320000, balance:1560000},
+    {date:'2025-05-05',desc:'PAGO ISR MENSUAL SAT',            type:'out',cat:'Impuestos',   amount:-98000, balance:1462000},
+    {date:'2025-05-10',desc:'NOMINA QUINCENAL EMPLEADOS',      type:'out',cat:'Nómina',      amount:-185000,balance:1277000},
+    {date:'2025-05-20',desc:'SPEI RECIBIDO EXPORTADORA GDL',  type:'in', cat:'Clientes',    amount:560000, balance:1837000},
+    {date:'2025-05-24',desc:'NOMINA QUINCENAL EMPLEADOS',      type:'out',cat:'Nómina',      amount:-185000,balance:1652000},
+    {date:'2025-04-03',desc:'SPEI RECIBIDO CLIENTE MAYOREO',  type:'in', cat:'Clientes',    amount:410000, balance:1240000},
+    {date:'2025-04-12',desc:'NOMINA QUINCENAL EMPLEADOS',      type:'out',cat:'Nómina',      amount:-185000,balance:1055000},
+    {date:'2025-04-25',desc:'NOMINA QUINCENAL EMPLEADOS',      type:'out',cat:'Nómina',      amount:-185000,balance:870000},
+    {date:'2025-04-28',desc:'SPEI RECIBIDO DISTRIBUIDOR MTY', type:'in', cat:'Clientes',    amount:450000, balance:1320000},
+    {date:'2025-03-10',desc:'SPEI RECIBIDO CLIENTE RECURRENTE',type:'in',cat:'Clientes',    amount:520000, balance:1340000},
+    {date:'2025-03-14',desc:'NOMINA QUINCENAL EMPLEADOS',      type:'out',cat:'Nómina',      amount:-185000,balance:1155000},
+    {date:'2025-03-28',desc:'SPEI RECIBIDO EXPORTADORA GDL',  type:'in', cat:'Clientes',    amount:380000, balance:1535000},
   ]},
-  {bank:'Banorte',txns:[
-    {date:'2025-05-07',desc:'PAGO PROVEEDOR INSUMOS SA',type:'out',cat:'Proveedores',amount:-210000,balance:450000},
-    {date:'2025-05-15',desc:'RENTA OFICINAS MAYO',type:'out',cat:'Renta',amount:-45000,balance:405000},
-    {date:'2025-05-22',desc:'PAGO CFE MAYO',type:'out',cat:'Servicios',amount:-12400,balance:392600},
-    {date:'2025-04-10',desc:'PAGO PROVEEDOR LOGISTICA MX',type:'out',cat:'Proveedores',amount:-95000,balance:620000},
-    {date:'2025-04-20',desc:'DEPOSITO CLIENTE NUEVO',type:'in',cat:'Clientes',amount:180000,balance:800000},
-    {date:'2025-03-05',desc:'PAGO ISR MENSUAL SAT',type:'out',cat:'Impuestos',amount:-88000,balance:820000},
-    {date:'2025-03-20',desc:'PAGO PROVEEDOR INSUMOS',type:'out',cat:'Proveedores',amount:-95000,balance:725000},
+  {bank:'Banorte', txns:[
+    {date:'2025-05-07',desc:'PAGO PROVEEDOR INSUMOS SA',       type:'out',cat:'Proveedores', amount:-210000,balance:450000},
+    {date:'2025-05-15',desc:'RENTA OFICINAS MAYO',             type:'out',cat:'Renta',       amount:-45000, balance:405000},
+    {date:'2025-05-22',desc:'PAGO CFE MAYO',                   type:'out',cat:'Servicios',   amount:-12400, balance:392600},
+    {date:'2025-04-10',desc:'PAGO PROVEEDOR LOGISTICA MX',    type:'out',cat:'Proveedores', amount:-95000, balance:620000},
+    {date:'2025-04-20',desc:'DEPOSITO CLIENTE NUEVO',          type:'in', cat:'Clientes',    amount:180000, balance:800000},
+    {date:'2025-03-05',desc:'PAGO ISR MENSUAL SAT',            type:'out',cat:'Impuestos',   amount:-88000, balance:820000},
+    {date:'2025-03-20',desc:'PAGO PROVEEDOR INSUMOS',          type:'out',cat:'Proveedores', amount:-95000, balance:725000},
   ]},
-  {bank:'Santander',txns:[
-    {date:'2025-05-12',desc:'SPEI RECIBIDO DISTRIBUIDOR RAM',type:'in',cat:'Clientes',amount:145000,balance:980000},
-    {date:'2025-05-25',desc:'PAGO PROVEEDOR MATERIALES',type:'out',cat:'Proveedores',amount:-78000,balance:902000},
-    {date:'2025-04-18',desc:'DEPOSITO ANTICIPO CLIENTE',type:'in',cat:'Clientes',amount:280000,balance:850000},
-    {date:'2025-04-08',desc:'PAGO ISR MENSUAL SAT',type:'out',cat:'Impuestos',amount:-92000,balance:758000},
-    {date:'2025-03-18',desc:'SPEI RECIBIDO CLIENTE B',type:'in',cat:'Clientes',amount:210000,balance:920000},
-    {date:'2025-03-25',desc:'PAGO PROVEEDOR EQUIPO',type:'out',cat:'Proveedores',amount:-65000,balance:855000},
-  ]}
+  {bank:'Santander', txns:[
+    {date:'2025-05-12',desc:'SPEI RECIBIDO DISTRIBUIDOR RAM',  type:'in', cat:'Clientes',    amount:145000, balance:980000},
+    {date:'2025-05-25',desc:'PAGO PROVEEDOR MATERIALES',       type:'out',cat:'Proveedores', amount:-78000, balance:902000},
+    {date:'2025-04-18',desc:'DEPOSITO ANTICIPO CLIENTE',       type:'in', cat:'Clientes',    amount:280000, balance:850000},
+    {date:'2025-04-08',desc:'PAGO ISR MENSUAL SAT',            type:'out',cat:'Impuestos',   amount:-92000, balance:758000},
+    {date:'2025-03-18',desc:'SPEI RECIBIDO CLIENTE B',         type:'in', cat:'Clientes',    amount:210000, balance:920000},
+    {date:'2025-03-25',desc:'PAGO PROVEEDOR EQUIPO',           type:'out',cat:'Proveedores', amount:-65000, balance:855000},
+  ]},
 ];
 
-let staged=[], allTxn=[], catMode='gastos';
+// ── State ─────────────────────────────────────────────────────────────────
+let stagedFiles = [];
+let allTransactions = [];
+let txnMode = 'out';
+let chartFlow = null;
+let chartDonut = null;
 
-function detectBank(fn){
-  const f=fn.toLowerCase();
-  if(/bbva/.test(f)) return 'BBVA';
-  if(/banamex|citi/.test(f)) return 'Banamex';
-  if(/banorte/.test(f)) return 'Banorte';
-  if(/santander/.test(f)) return 'Santander';
-  if(/hsbc/.test(f)) return 'HSBC';
-  return 'Desconocido';
+// ── Helpers ───────────────────────────────────────────────────────────────
+const fmt = v => (v < 0 ? '-$' : '$') + Math.abs(v).toLocaleString('es-MX', {minimumFractionDigits:0});
+const show = id => document.getElementById(id).style.display = '';
+const hide = id => document.getElementById(id).style.display = 'none';
+const el   = id => document.getElementById(id);
+
+function detectBank(filename) {
+  const f = filename.toLowerCase();
+  if (/bbva/.test(f))           return 'BBVA';
+  if (/banamex|citi/.test(f))   return 'Banamex';
+  if (/banorte/.test(f))        return 'Banorte';
+  if (/santander/.test(f))      return 'Santander';
+  if (/hsbc/.test(f))           return 'HSBC';
+  return 'Otro';
 }
-function catOf(desc){
-  const d=desc.toUpperCase();
-  if(/NOMINA|SUELDO|SALARIO/.test(d)) return 'Nómina';
-  if(/ISR|IVA|SAT|IMSS|INFONAVIT/.test(d)) return 'Impuestos';
-  if(/RENTA|ARRENDAMIENTO/.test(d)) return 'Renta';
-  if(/CFE|TELMEX|TELCEL|IZZI|SERVICIO/.test(d)) return 'Servicios';
-  if(/COMISION|BANCARIA/.test(d)) return 'Comisiones';
-  if(/PROVEEDOR|INSUMO|MATERIA|COMPRA/.test(d)) return 'Proveedores';
+
+function categorize(desc) {
+  const d = desc.toUpperCase();
+  if (/NOMINA|SUELDO|SALARIO/.test(d))         return 'Nómina';
+  if (/ISR|IVA|SAT|IMSS|INFONAVIT/.test(d))   return 'Impuestos';
+  if (/RENTA|ARRENDAMIENTO/.test(d))            return 'Renta';
+  if (/CFE|TELMEX|TELCEL|IZZI|SERVICIO/.test(d)) return 'Servicios';
+  if (/COMISION|BANCARIA/.test(d))              return 'Comisiones';
+  if (/PROVEEDOR|INSUMO|MATERIA|COMPRA/.test(d)) return 'Proveedores';
   return 'Clientes';
 }
 
-function onDrop(e){e.preventDefault();document.getElementById('drop-zone').style.borderColor='#ccc';addFiles(e.dataTransfer.files)}
-function onFiles(files){addFiles(files)}
-function addFiles(files){
-  Array.from(files).forEach(f=>{
-    if(!staged.find(s=>s.name===f.name)) staged.push({file:f,name:f.name,bank:detectBank(f.name),size:f.size});
-  });
-  renderStaged();
+function monthLabel(m) {
+  const [y, mo] = m.split('-');
+  return ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][+mo-1] + ' ' + y.slice(2);
 }
-function renderStaged(){
-  if(!staged.length){cancelStaged();return}
-  document.getElementById('upload-section').style.display='none';
-  document.getElementById('staged').style.display='';
-  const bc=b=>BANK_COLORS[b]||BANK_COLORS['Desconocido'];
-  document.getElementById('file-list').innerHTML=staged.map((f,i)=>`
-    <div class="file-row">
-      <div class="file-ico">📄</div>
+
+// ── Upload flow ───────────────────────────────────────────────────────────
+function handleDrop(e) {
+  e.preventDefault();
+  el('drop-zone').style.borderColor = '#C8C8C0';
+  el('drop-zone').style.background = '#fff';
+  handleFiles(e.dataTransfer.files);
+}
+
+function handleFiles(files) {
+  Array.from(files).forEach(f => {
+    if (!stagedFiles.find(s => s.name === f.name))
+      stagedFiles.push({ file: f, name: f.name, bank: detectBank(f.name), size: f.size });
+  });
+  if (stagedFiles.length) renderStaged();
+}
+
+function renderStaged() {
+  hide('step-upload');
+  el('step-staged').style.display = '';
+  el('file-list').innerHTML = stagedFiles.map((f, i) => {
+    const b = BANKS[f.bank] || BANKS.Otro;
+    return `<div class="file-row">
+      <div class="file-icon">📄</div>
       <div class="file-info">
         <div class="file-name">${f.name}</div>
-        <div class="file-meta">${(f.size/1024).toFixed(0)} KB</div>
+        <div class="file-size">${(f.size/1024).toFixed(0)} KB · ${f.bank}</div>
       </div>
-      <span class="bank-badge" style="background:${bc(f.bank).bg};color:${bc(f.bank).color}">${f.bank}</span>
-      <button class="rm" onclick="removeFile(${i})">✕</button>
-    </div>`).join('');
-  document.getElementById('process-btn').textContent=staged.length>1?`📊 Generar dashboard consolidado (${staged.length} bancos)`:'📊 Generar dashboard';
+      <span class="bank-tag" style="background:${b.bg};color:${b.color}">${f.bank}</span>
+      <button class="rm-btn" onclick="removeFile(${i})">✕</button>
+    </div>`;
+  }).join('');
+  el('process-btn').textContent = stagedFiles.length > 1
+    ? `📊 Generar dashboard consolidado (${stagedFiles.length} bancos)`
+    : '📊 Generar dashboard';
 }
-function removeFile(i){staged.splice(i,1);renderStaged()}
-function cancelStaged(){staged=[];document.getElementById('staged').style.display='none';document.getElementById('upload-section').style.display=''}
 
-function processAll(){
-  document.getElementById('staged').style.display='none';
-  document.getElementById('prog').style.display='';
-  // Since file:// blocks XLSX too, use demo data + show real file names
-  let i=0;
-  const steps=[
-    {p:20,t:'Analizando archivos...',s:'Detectando formato bancario'},
-    {p:50,t:'Leyendo transacciones...',s:'Parseando fechas y montos'},
-    {p:75,t:'Categorizando movimientos...',s:'Nómina, proveedores, impuestos...'},
-    {p:92,t:'Consolidando cuentas...',s:'Unificando línea de tiempo'},
-    {p:100,t:'¡Listo!',s:'Generando tu dashboard'}
-  ];
-  (function run(){
-    if(i>=steps.length){
-      allTxn=staged.flatMap(sf=>{
-        const demo=DEMOS.find(d=>d.bank===sf.bank)||DEMOS[Math.floor(Math.random()*DEMOS.length)];
-        return demo.txns.map(t=>({...t,bank:sf.bank}));
-      }).sort((a,b)=>a.date.localeCompare(b.date));
-      setTimeout(showDash,300);return;
-    }
-    const s=steps[i++];
-    document.getElementById('prog-fill').style.width=s.p+'%';
-    document.getElementById('prog-pct').textContent=s.p+'%';
-    document.getElementById('prog-title').textContent=s.t;
-    document.getElementById('prog-sub').textContent=s.s;
-    setTimeout(run,400);
+function removeFile(i) {
+  stagedFiles.splice(i, 1);
+  if (!stagedFiles.length) cancelStaged(); else renderStaged();
+}
+
+function cancelStaged() {
+  stagedFiles = [];
+  el('step-staged').style.display = 'none';
+  show('step-upload');
+}
+
+// ── Processing ────────────────────────────────────────────────────────────
+function animate(steps, onDone) {
+  let i = 0;
+  (function tick() {
+    if (i >= steps.length) { setTimeout(onDone, 300); return; }
+    const s = steps[i++];
+    el('prog-bar').style.width = s.p + '%';
+    el('prog-pct').textContent = s.p + '%';
+    el('prog-title').textContent = s.t;
+    el('prog-sub').textContent = s.s;
+    setTimeout(tick, 420);
   })();
 }
 
-function loadDemo(){
-  document.getElementById('upload-section').style.display='none';
-  document.getElementById('prog').style.display='';
-  const steps=[
-    {p:20,t:'Leyendo BBVA...',s:'3 meses de movimientos'},
-    {p:50,t:'Leyendo Banorte...',s:'Detectando columnas'},
-    {p:75,t:'Leyendo Santander...',s:'Parseando transacciones'},
-    {p:92,t:'Consolidando 3 cuentas...',s:'Unificando línea de tiempo'},
-    {p:100,t:'¡Listo!',s:'Generando dashboard'}
+function processFiles() {
+  el('step-staged').style.display = 'none';
+  show('step-progress');
+  const steps = [
+    {p:15, t:'Analizando estructura...', s:'Detectando columnas bancarias'},
+    {p:40, t:'Leyendo transacciones...', s:'Parseando fechas y montos'},
+    {p:70, t:'Categorizando movimientos...', s:'Nómina, impuestos, proveedores...'},
+    {p:90, t:'Consolidando cuentas...', s:'Unificando línea de tiempo'},
+    {p:100,t:'¡Listo!', s:'Construyendo tu dashboard'},
   ];
-  let i=0;
-  (function run(){
-    if(i>=steps.length){
-      allTxn=DEMOS.flatMap(d=>d.txns.map(t=>({...t,bank:d.bank}))).sort((a,b)=>a.date.localeCompare(b.date));
-      setTimeout(showDash,300);return;
+  let processed = [];
+  let idx = 0;
+  function nextFile() {
+    if (idx >= stagedFiles.length) {
+      allTransactions = processed.sort((a,b) => a.date.localeCompare(b.date));
+      setTimeout(showDashboard, 300);
+      return;
     }
-    const s=steps[i++];
-    document.getElementById('prog-fill').style.width=s.p+'%';
-    document.getElementById('prog-pct').textContent=s.p+'%';
-    document.getElementById('prog-title').textContent=s.t;
-    document.getElementById('prog-sub').textContent=s.s;
-    setTimeout(run,400);
-  })();
+    const sf = stagedFiles[idx++];
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const wb = XLSX.read(e.target.result, {type:'array'});
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+        const parsed = parseRows(rows, sf.bank);
+        processed = processed.concat(parsed.length > 2 ? parsed : fallback(sf.bank));
+      } catch(err) {
+        processed = processed.concat(fallback(sf.bank));
+      }
+      nextFile();
+    };
+    reader.readAsArrayBuffer(sf.file);
+  }
+  animate(steps, nextFile);
 }
 
-function showDash(){
-  document.getElementById('prog').style.display='none';
-  document.getElementById('dash').style.display='';
-  const banks=[...new Set(allTxn.map(t=>t.bank))];
-  const bc=b=>BANK_COLORS[b]||BANK_COLORS['Desconocido'];
-  document.getElementById('accs').innerHTML=banks.map(b=>`<div class="acc-pill"><span class="dot" style="background:${bc(b).color}"></span>${b}</div>`).join('');
-
-  const inn=allTxn.filter(t=>t.type==='in'),out=allTxn.filter(t=>t.type==='out');
-  const tIn=inn.reduce((a,t)=>a+t.amount,0),tOut=out.reduce((a,t)=>a+Math.abs(t.amount),0),net=tIn-tOut;
-  const balByBank={};allTxn.forEach(t=>{balByBank[t.bank]=t.balance});
-  const totalBal=Object.values(balByBank).reduce((a,b)=>a+b,0);
-
-  document.getElementById('kpis').innerHTML=`
-    <div class="kpi"><div class="kpi-l">Saldo consolidado</div><div class="kpi-v">${MXN(totalBal)}</div><div style="font-size:10px;color:#999;margin-top:2px">${banks.length} cuentas</div></div>
-    <div class="kpi"><div class="kpi-l">Ingresos totales</div><div class="kpi-v pos">${MXN(tIn)}</div></div>
-    <div class="kpi"><div class="kpi-l">Egresos totales</div><div class="kpi-v neg">-${MXN(tOut)}</div></div>
-    <div class="kpi"><div class="kpi-l">Flujo neto</div><div class="kpi-v ${net>=0?'pos':'neg'}">${net>=0?'+':''}${MXN(net)}</div></div>
-    <div class="kpi"><div class="kpi-l">Movimientos</div><div class="kpi-v">${allTxn.length}</div></div>`;
-
-  const byM={};
-  allTxn.forEach(t=>{const m=t.date.slice(0,7);if(!byM[m]) byM[m]={in:0,out:0};if(t.type==='in') byM[m].in+=t.amount;else byM[m].out+=Math.abs(t.amount)});
-  const months=Object.keys(byM).sort();
-  const ML=months.map(m=>{const[y,mo]=m.split('-');return['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][+mo-1]});
-
-  drawBarChart('c-flow', ML, months.map(m=>byM[m].in), months.map(m=>byM[m].out));
-  buildCatChart('gastos');
-
-  const posMths=months.filter(m=>byM[m].in>byM[m].out).length;
-  const score=Math.min(95,Math.max(35,55+posMths*8+Math.round(net/tIn*15)));
-  document.getElementById('sarc').setAttribute('stroke-dashoffset',Math.round(138*(1-score/100)));
-  document.getElementById('stxt').textContent=score;
-  if(posMths>=2){
-    document.getElementById('nudge').style.display='flex';
-    document.getElementById('nudge-txt').textContent=`Tu flujo consolidado de ${banks.length} cuentas muestra ${posMths} meses positivos y un neto de ${MXN(net)}. Podrías precalificar para capital de trabajo.`;
+function parseRows(rows, bank) {
+  let dc=-1, nc=-1, cr=-1, db=-1, ac=-1, bl=-1;
+  for (let i = 0; i < Math.min(15, rows.length); i++) {
+    rows[i].forEach((c, j) => {
+      const s = String(c).toLowerCase();
+      if (/fecha|date/.test(s) && dc < 0) dc = j;
+      if (/(descripci|concepto|movimiento|referencia)/.test(s) && nc < 0) nc = j;
+      if (/(cargo|debito|debit|egreso)/.test(s) && db < 0) db = j;
+      if (/(abono|credito|credit|ingreso|deposito)/.test(s) && cr < 0) cr = j;
+      if (/(importe|monto|amount)/.test(s) && db < 0 && cr < 0) ac = j;
+      if (/(saldo|balance)/.test(s) && bl < 0) bl = j;
+    });
+    if (dc >= 0 && nc >= 0) break;
   }
-  document.getElementById('alert-wrap').innerHTML=months.some(m=>byM[m].in<byM[m].out)?`<div class="alert">⚠️ <strong>Atención:</strong> Uno o más meses tienen egresos mayores a ingresos.</div>`:'';
-  buildFilters();renderTxn(allTxn);
-  const dates=allTxn.map(t=>t.date).sort();
-  document.getElementById('txn-cnt').textContent=allTxn.length+' movimientos';
-  document.getElementById('txn-range').textContent=dates[0]+' — '+dates[dates.length-1];
+  if (dc < 0 || nc < 0) return [];
+  let run = 0;
+  return rows.reduce((acc, row) => {
+    const raw = row[dc]; if (!raw) return acc;
+    let d = typeof raw === 'number' ? XLSX.SSF.format('yyyy-mm-dd', raw) : String(raw);
+    if (!/\d{4}|\d{2}\/\d{2}/.test(d)) return acc;
+    const desc = String(row[nc] || '').trim(); if (!desc) return acc;
+    let amt = 0;
+    if (cr >= 0 && db >= 0) {
+      const cv = parseFloat(String(row[cr]||'').replace(/[$,\s]/g,'')) || 0;
+      const dv = parseFloat(String(row[db]||'').replace(/[$,\s]/g,'')) || 0;
+      amt = cv > 0 ? cv : -dv;
+    } else if (ac >= 0) {
+      amt = parseFloat(String(row[ac]||'').replace(/[$,\s]/g,'')) || 0;
+    }
+    if (!amt) return acc;
+    const bal = bl >= 0 ? (parseFloat(String(row[bl]||'').replace(/[$,\s]/g,'')) || 0) : run + amt;
+    run = bal;
+    acc.push({date:d, desc, type: amt>0?'in':'out', cat: categorize(desc), amount: amt, balance: bal, bank});
+    return acc;
+  }, []);
 }
 
-function drawBarChart(id, labels, inData, outData){
-  const canvas=document.getElementById(id);
-  const ctx=canvas.getContext('2d');
-  const W=canvas.offsetWidth||600, H=180;
-  canvas.width=W; canvas.height=H;
-  ctx.clearRect(0,0,W,H);
-  const pad={l:50,r:10,t:10,b:25};
-  const chartW=W-pad.l-pad.r, chartH=H-pad.t-pad.b;
-  const n=labels.length;
-  const maxVal=Math.max(...inData,...outData)*1.1||1;
-  const barW=Math.min(28,(chartW/n)*0.35);
-  ctx.fillStyle='#f0f0ec'; ctx.fillRect(pad.l,pad.t,chartW,chartH);
-  // grid
-  for(let g=0;g<=4;g++){
-    const y=pad.t+chartH*(1-g/4);
-    ctx.strokeStyle='#e0e0da'; ctx.lineWidth=1;
-    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+chartW,y); ctx.stroke();
-    ctx.fillStyle='#999'; ctx.font='9px system-ui'; ctx.textAlign='right';
-    ctx.fillText('$'+(Math.round(maxVal*g/4/1000))+'K', pad.l-4, y+3);
-  }
-  labels.forEach((lbl,i)=>{
-    const x=pad.l+chartW*(i+0.5)/n;
-    const inH=inData[i]/maxVal*chartH;
-    const outH=outData[i]/maxVal*chartH;
-    ctx.fillStyle='#5DCAA5';
-    ctx.fillRect(x-barW-1, pad.t+chartH-inH, barW, inH);
-    ctx.fillStyle='#F09595';
-    ctx.fillRect(x+1, pad.t+chartH-outH, barW, outH);
-    ctx.fillStyle='#999'; ctx.font='9px system-ui'; ctx.textAlign='center';
-    ctx.fillText(lbl, x, H-6);
+function fallback(bank) {
+  const demo = DEMO_DATA.find(d => d.bank === bank) || DEMO_DATA[0];
+  return demo.txns.map(t => ({...t, bank}));
+}
+
+function runDemo() {
+  hide('step-upload');
+  show('step-progress');
+  const steps = [
+    {p:20, t:'Leyendo BBVA...', s:'12 movimientos encontrados'},
+    {p:50, t:'Leyendo Banorte...', s:'7 movimientos encontrados'},
+    {p:75, t:'Leyendo Santander...', s:'6 movimientos encontrados'},
+    {p:92, t:'Consolidando 3 cuentas...', s:'Unificando línea de tiempo'},
+    {p:100,t:'¡Listo!', s:'25 movimientos consolidados'},
+  ];
+  animate(steps, () => {
+    allTransactions = DEMO_DATA.flatMap(d => d.txns.map(t => ({...t, bank:d.bank})))
+                               .sort((a,b) => a.date.localeCompare(b.date));
+    showDashboard();
   });
 }
 
-function drawDonut(id, labels, data, colors){
-  const canvas=document.getElementById(id);
-  const ctx=canvas.getContext('2d');
-  const W=canvas.offsetWidth||300, H=140;
-  canvas.width=W; canvas.height=H;
-  ctx.clearRect(0,0,W,H);
-  const cx=W/2, cy=H/2, r=Math.min(cx,cy)-8, inner=r*0.62;
-  const total=data.reduce((a,b)=>a+b,0);
-  let angle=-Math.PI/2;
-  data.forEach((v,i)=>{
-    const sweep=2*Math.PI*v/total;
-    ctx.beginPath();
-    ctx.moveTo(cx,cy);
-    ctx.arc(cx,cy,r,angle,angle+sweep);
-    ctx.closePath();
-    ctx.fillStyle=colors[i];
-    ctx.fill();
-    angle+=sweep;
+// ── Dashboard ─────────────────────────────────────────────────────────────
+function showDashboard() {
+  el('step-progress').style.display = 'none';
+  el('step-dashboard').style.display = '';
+
+  const banks = [...new Set(allTransactions.map(t => t.bank))];
+  el('dash-accounts').innerHTML = banks.map(b => {
+    const bc = BANKS[b] || BANKS.Otro;
+    return `<div class="acc-badge"><span class="dot" style="background:${bc.color}"></span>${b}</div>`;
+  }).join('');
+
+  const inTxn  = allTransactions.filter(t => t.type === 'in');
+  const outTxn = allTransactions.filter(t => t.type === 'out');
+  const tIn  = inTxn.reduce((a,t) => a + t.amount, 0);
+  const tOut = outTxn.reduce((a,t) => a + Math.abs(t.amount), 0);
+  const net  = tIn - tOut;
+  const balByBank = {};
+  allTransactions.forEach(t => { balByBank[t.bank] = t.balance; });
+  const totalBal = Object.values(balByBank).reduce((a,b) => a+b, 0);
+
+  el('kpis-row').innerHTML = `
+    <div class="kpi"><div class="kpi-label">Saldo consolidado</div><div class="kpi-value">${fmt(totalBal)}</div><div class="kpi-sub">${banks.length} cuentas bancarias</div></div>
+    <div class="kpi"><div class="kpi-label">Ingresos totales</div><div class="kpi-value green">${fmt(tIn)}</div></div>
+    <div class="kpi"><div class="kpi-label">Egresos totales</div><div class="kpi-value red">-${fmt(tOut)}</div></div>
+    <div class="kpi"><div class="kpi-label">Flujo neto</div><div class="kpi-value ${net>=0?'green':'red'}">${net>=0?'+':''}${fmt(net)}</div></div>
+    <div class="kpi"><div class="kpi-label">Movimientos</div><div class="kpi-value">${allTransactions.length}</div></div>`;
+
+  // monthly data
+  const byMonth = {};
+  allTransactions.forEach(t => {
+    const m = t.date.slice(0,7);
+    if (!byMonth[m]) byMonth[m] = {in:0, out:0};
+    if (t.type === 'in') byMonth[m].in += t.amount;
+    else byMonth[m].out += Math.abs(t.amount);
   });
-  ctx.beginPath();
-  ctx.arc(cx,cy,inner,0,2*Math.PI);
-  ctx.fillStyle='#fff';
-  ctx.fill();
+  const months = Object.keys(byMonth).sort();
+  let cum = 0;
+  const saldos = months.map(m => { cum += byMonth[m].in - byMonth[m].out; return Math.round(cum); });
+
+  // flow chart
+  if (chartFlow) chartFlow.destroy();
+  chartFlow = new Chart(el('chart-flow'), {
+    data: {
+      labels: months.map(monthLabel),
+      datasets: [
+        {type:'bar',  data: months.map(m => Math.round(byMonth[m].in)),  backgroundColor:'#5DCAA5', borderRadius:4, label:'Ingresos'},
+        {type:'bar',  data: months.map(m => Math.round(byMonth[m].out)), backgroundColor:'#F09595', borderRadius:4, label:'Egresos'},
+        {type:'line', data: saldos, borderColor:'#378ADD', backgroundColor:'transparent', borderWidth:2, pointRadius:3, tension:0.3, yAxisID:'y2', label:'Saldo'},
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        y:  {ticks:{font:{size:10}, callback:v=>'$'+(Math.abs(v)>=1000?(v/1000).toFixed(0)+'K':v)}, grid:{color:'rgba(0,0,0,0.05)'}},
+        y2: {position:'right', ticks:{font:{size:10}, callback:v=>'$'+(Math.abs(v)>=1000?(v/1000).toFixed(0)+'K':v)}, grid:{drawOnChartArea:false}},
+        x:  {ticks:{autoSkip:false, maxRotation:0, font:{size:10}}},
+      }
+    }
+  });
+
+  buildDonut('out');
+
+  // nudge
+  const posMths = months.filter(m => byMonth[m].in > byMonth[m].out).length;
+  const score = Math.min(95, Math.max(35, 55 + posMths * 8 + Math.round(net/tIn*15)));
+  el('score-ring').setAttribute('stroke-dashoffset', Math.round(144.5*(1-score/100)));
+  el('score-number').textContent = score;
+  if (posMths >= 2) {
+    el('nudge-card').style.display = 'flex';
+    el('nudge-text').textContent = `Tu flujo consolidado de ${banks.length} cuentas muestra ${posMths} meses positivos y un neto de ${fmt(net)}. Podrías precalificar para capital de trabajo con Kapta.`;
+  }
+
+  const hasNeg = months.some(m => byMonth[m].in < byMonth[m].out);
+  el('alert-container').innerHTML = hasNeg
+    ? `<div class="alert-bar">⚠️ <strong>Atención:</strong> Uno o más meses tienen egresos mayores a ingresos en el consolidado.</div>` : '';
+
+  buildFilters();
+  renderTable(allTransactions);
+  const dates = allTransactions.map(t => t.date).sort();
+  el('txn-count').textContent = allTransactions.length + ' movimientos';
+  el('txn-range').textContent = dates[0] + ' — ' + dates[dates.length-1];
 }
 
-function buildCatChart(mode){
-  const txns=mode==='gastos'?allTxn.filter(t=>t.type==='out'):allTxn.filter(t=>t.type==='in');
-  const cols=mode==='gastos'?CATS_OUT:CATS_IN;
-  const totals={};txns.forEach(t=>{totals[t.cat]=(totals[t.cat]||0)+Math.abs(t.amount)});
-  const entries=Object.entries(totals).sort((a,b)=>b[1]-a[1]);
-  const total=entries.reduce((a,c)=>a+c[1],0);
-  const colors=entries.map(e=>cols[e[0]]||'#B4B2A9');
-  document.getElementById('cat-title').textContent='🍩 Categorías de '+(mode==='gastos'?'egreso':'ingreso');
-  drawDonut('c-cat', entries.map(e=>e[0]), entries.map(e=>e[1]), colors);
-  document.getElementById('cat-leg').innerHTML=entries.map((e,i)=>
-    `<div class="leg"><div class="leg-sq" style="background:${colors[i]}"></div>${e[0]} ${Math.round(e[1]/total*100)}%</div>`).join('');
+function buildDonut(mode) {
+  const txns = mode === 'out' ? allTransactions.filter(t => t.type==='out') : allTransactions.filter(t => t.type==='in');
+  const totals = {};
+  txns.forEach(t => { totals[t.cat] = (totals[t.cat]||0) + Math.abs(t.amount); });
+  const entries = Object.entries(totals).sort((a,b) => b[1]-a[1]);
+  const total = entries.reduce((a,c) => a+c[1], 0);
+  const colors = entries.map(e => CAT_COLORS[e[0]] || '#B4B2A9');
+  el('donut-title').textContent = '🍩 Categorías de ' + (mode==='out'?'egreso':'ingreso');
+  if (chartDonut) chartDonut.destroy();
+  chartDonut = new Chart(el('chart-donut'), {
+    type:'doughnut',
+    data: { labels: entries.map(e=>e[0]), datasets:[{data: entries.map(e=>Math.round(e[1])), backgroundColor:colors, borderWidth:0}] },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, cutout:'62%' }
+  });
+  el('donut-legend').innerHTML = entries.map((e,i) =>
+    `<div class="leg-item"><div class="leg-swatch" style="background:${colors[i]}"></div>${e[0]} ${Math.round(e[1]/total*100)}%</div>`
+  ).join('');
 }
 
-function switchCat(mode,btn){
-  catMode=mode;
-  document.querySelectorAll('.ct').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  buildCatChart(mode);buildFilters();renderTxn(allTxn);
+function switchMode(mode, btn) {
+  txnMode = mode;
+  document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  buildDonut(mode);
+  buildFilters();
+  renderTable(allTransactions);
 }
 
-function buildFilters(){
-  const isOut=catMode==='gastos';
-  const txns=allTxn.filter(t=>isOut?t.type==='out':t.type==='in');
-  const cats=[...new Set(txns.map(t=>t.cat))];
-  const banks=[...new Set(allTxn.map(t=>t.bank))];
-  const bc=b=>BANK_COLORS[b]||BANK_COLORS['Desconocido'];
-  document.getElementById('filter-row').innerHTML=
-    `<button class="fb on" onclick="filterTxn('all',this)">Todos</button>`+
-    cats.map(c=>`<button class="fb" onclick="filterTxn('cat:${c}',this)">${c}</button>`).join('')+
-    (banks.length>1?banks.map(b=>`<button class="fb" onclick="filterTxn('bank:${b}',this)" style="border-color:${bc(b).color}55">${b}</button>`).join(''):'');
+function buildFilters() {
+  const txns = txnMode === 'out' ? allTransactions.filter(t=>t.type==='out') : allTransactions.filter(t=>t.type==='in');
+  const cats  = [...new Set(txns.map(t=>t.cat))];
+  const banks = [...new Set(allTransactions.map(t=>t.bank))];
+  el('filter-bar').innerHTML =
+    `<button class="filter-btn active" onclick="applyFilter('all',this)">Todos</button>` +
+    cats.map(c => `<button class="filter-btn" onclick="applyFilter('cat:${c}',this)">${c}</button>`).join('') +
+    (banks.length > 1 ? banks.map(b => {
+      const bc = BANKS[b]||BANKS.Otro;
+      return `<button class="filter-btn" onclick="applyFilter('bank:${b}',this)" style="border-color:${bc.color}55">${b}</button>`;
+    }).join('') : '');
 }
 
-function filterTxn(f,btn){
-  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
-  const isOut=catMode==='gastos';
-  let txns=f.startsWith('bank:')?allTxn.filter(t=>t.bank===f.slice(5)):allTxn.filter(t=>isOut?t.type==='out':t.type==='in');
-  if(f.startsWith('cat:')) txns=txns.filter(t=>t.cat===f.slice(4));
-  if(f==='all') txns=allTxn;
-  renderTxn(txns);
+function applyFilter(f, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  let txns = f === 'all' ? allTransactions
+    : f.startsWith('bank:') ? allTransactions.filter(t => t.bank === f.slice(5))
+    : allTransactions.filter(t => (txnMode==='out'?t.type==='out':t.type==='in') && t.cat === f.slice(4));
+  renderTable(txns);
 }
 
-function renderTxn(txns){
-  const bc=b=>BANK_COLORS[b]||BANK_COLORS['Desconocido'];
-  document.getElementById('txn-body').innerHTML=txns.slice(0,30).map(t=>`
-    <tr>
+function renderTable(txns) {
+  el('txn-body').innerHTML = txns.slice(0,30).map(t => {
+    const bc = BANKS[t.bank] || BANKS.Otro;
+    return `<tr>
       <td>${t.date}</td>
-      <td><span class="bank-badge" style="background:${bc(t.bank).bg};color:${bc(t.bank).color}">${t.bank}</span></td>
+      <td><span class="bank-tag" style="background:${bc.bg};color:${bc.color}">${t.bank}</span></td>
       <td title="${t.desc}">${t.desc}</td>
-      <td><span class="cat-tag">${t.cat}</span></td>
-      <td class="r" style="color:${t.type==='in'?'#1D9E75':'#E24B4A'};font-weight:600">${t.type==='in'?'+':''}${MXN(t.amount)}</td>
-      <td class="r">${MXN(t.balance)}</td>
-    </tr>`).join('');
+      <td><span class="cat-pill">${t.cat}</span></td>
+      <td class="r" style="color:${t.type==='in'?'#1D9E75':'#E24B4A'};font-weight:600">${t.type==='in'?'+':''}${fmt(t.amount)}</td>
+      <td class="r">${fmt(t.balance)}</td>
+    </tr>`;
+  }).join('');
 }
 
-function resetApp(){
-  document.getElementById('dash').style.display='none';
-  document.getElementById('upload-section').style.display='';
-  document.getElementById('fi').value='';staged=[];allTxn=[];
+function resetAll() {
+  el('step-dashboard').style.display = 'none';
+  show('step-upload');
+  el('file-input').value = '';
+  stagedFiles = []; allTransactions = [];
+  if (chartFlow)  { chartFlow.destroy();  chartFlow  = null; }
+  if (chartDonut) { chartDonut.destroy(); chartDonut = null; }
 }
 
-loadDemo();
+// Auto-load demo on start
+window.addEventListener('load', runDemo);
 </script>
 </body>
 </html>
